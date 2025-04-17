@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>오늘 할일 체크리스트✔</title>
+    <style>
+      li {
+        margin-bottom: 8px;
+      }
+      button {
+        margin-left: 5px;
+      }
+    </style>
+  </head>
+  <body>
+    <h2>오늘 할일 체크리스트✔</h2>
+    <input type="text" id="todoInput" placeholder="할 일 입력" />
+    <button onclick="addTodo()">저장</button>
+
+    <ul id="todoList"></ul>
+
+    <script>
+      // todo 리스트를 가져오는 함수
+      function getTodos() {
+        const todos = localStorage.getItem("todos");
+        return todos ? JSON.parse(todos) : [];
+      }
+
+      // todo 리스트를 저장하는 함수
+      function saveTodos(todos) {
+        localStorage.setItem("todos", JSON.stringify(todos));
+      }
+
+      // 리스트를 화면에 출력
+      function renderTodos() {
+        const todoList = document.getElementById("todoList");
+        todoList.innerHTML = "";
+        const todos = getTodos();
+
+        todos.forEach((todo, index) => {
+          const li = document.createElement("li");
+          li.innerText = todo;
+
+          const editBtn = document.createElement("button");
+          editBtn.innerText = "수정";
+          editBtn.onclick = () => editTodo(index);
+
+          const deleteBtn = document.createElement("button");
+          deleteBtn.innerText = "삭제";
+          deleteBtn.onclick = () => deleteTodo(index);
+
+          li.appendChild(editBtn);
+          li.appendChild(deleteBtn);
+          todoList.appendChild(li);
+        });
+      }
+
+      // todo 추가
+      function addTodo() {
+        const input = document.getElementById("todoInput");
+        const newTodo = input.value.trim();
+        if (newTodo === "") return alert("할 일을 입력해주세요!");
+
+        const todos = getTodos();
+        todos.push(newTodo);
+        saveTodos(todos);
+        input.value = "";
+        renderTodos();
+      }
+
+      // todo 수정
+      function editTodo(index) {
+        const todos = getTodos();
+        const newText = prompt("수정할 내용을 입력하세요:", todos[index]);
+        if (newText !== null && newText.trim() !== "") {
+          todos[index] = newText.trim();
+          saveTodos(todos);
+          renderTodos();
+        }
+      }
+
+      // todo 삭제
+      function deleteTodo(index) {
+        const todos = getTodos();
+        todos.splice(index, 1);
+        saveTodos(todos);
+        renderTodos();
+      }
+
+      // 페이지 로드 시 기존 todo 불러오기
+      window.onload = renderTodos;
+    </script>
+  </body>
+</html>
